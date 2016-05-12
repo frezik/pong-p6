@@ -5,6 +5,11 @@ use SDL2::Raw;
 constant WIDTH = 800;
 constant HEIGHT = 600;
 
+constant BALL_WIDTH = 10;
+constant BALL_HEIGHT = 10;
+constant BALL_START_X = (WIDTH / 2) - (BALL_WIDTH / 2);
+constant BALL_START_Y = (HEIGHT / 2) - (BALL_HEIGHT / 2);
+
 constant K_UP = 82;
 constant K_DOWN = 81;
 
@@ -31,6 +36,10 @@ my $paddle2_rect = SDL_Rect.new(
     (HEIGHT / 2) - (PADDLE_HEIGHT / 2),
     PADDLE_WIDTH, PADDLE_HEIGHT,
 );
+my $ball_rect = SDL_Rect.new(
+    BALL_START_X, BALL_START_Y,
+    BALL_WIDTH, BALL_HEIGHT,
+);
 
 my $move_down = 0;
 my $move_up = 0;
@@ -52,7 +61,6 @@ sub init()
 
 sub main_loop( $window, $render )
 {
-
     loop {
         my $start_frame = now;
 
@@ -129,6 +137,9 @@ sub update_drawing( $window, $render )
     SDL_SetRenderDrawColor( $render, 255, 0, 0, 255 );
     SDL_RenderFillRect( $render, $paddle1_rect );
     SDL_RenderFillRect( $render, $paddle2_rect );
+
+    SDL_SetRenderDrawColor( $render, 0, 255, 0, 255 );
+    SDL_RenderFillRect( $render, $ball_rect );
 
     SDL_RenderPresent( $render );
     return;
