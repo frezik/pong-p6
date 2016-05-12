@@ -9,6 +9,7 @@ constant K_UP = 82;
 constant K_DOWN = 81;
 
 constant MAX_FPS = 60;
+constant TIME_PER_FRAME = 1 / MAX_FPS;
 
 constant PADDLE_WIDTH = 4;
 constant PADDLE_HEIGHT = (HEIGHT / 10).round;
@@ -53,9 +54,18 @@ sub main_loop( $window, $render )
 {
 
     loop {
+        my $start_frame = now;
+
         return if ! poll_events();
         update_location();
         update_drawing( $window, $render );
+
+        my $end_frame = now;
+        my $elapsed_time = $end_frame - $start_frame;
+        if $elapsed_time < TIME_PER_FRAME {
+            my $sleep_time = TIME_PER_FRAME - $elapsed_time;
+            sleep( $sleep_time );
+        }
     }
 
     return 1;
