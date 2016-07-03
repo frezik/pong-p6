@@ -21,7 +21,7 @@ constant PADDLE_HEIGHT = (HEIGHT / 10).round;
 constant PADDLE_MARGIN_LEFT = 10;
 constant PADDLE_MARGIN_RIGHT = WIDTH - PADDLE_WIDTH - PADDLE_WIDTH;
 
-constant PADDLE_MOVE_SPEED = 2;
+constant PADDLE_MOVE_SPEED = 240;
 constant PADDLE_BOTTOM_Y = HEIGHT - PADDLE_HEIGHT;
 
 
@@ -61,17 +61,19 @@ sub init()
 
 sub main_loop( $window, $render )
 {
+    my Duration $last_elapsed_time;
+
     loop {
         my $start_frame = now;
 
         return if ! poll_events();
-        update_location();
+        update_location( $last_elapsed_time ) if $last_elapsed_time;
         update_drawing( $window, $render );
 
         my $end_frame = now;
-        my $elapsed_time = $end_frame - $start_frame;
-        if $elapsed_time < TIME_PER_FRAME {
-            my $sleep_time = TIME_PER_FRAME - $elapsed_time;
+        $last_elapsed_time = $end_frame - $start_frame;
+        if $last_elapsed_time < TIME_PER_FRAME {
+            my $sleep_time = TIME_PER_FRAME - $last_elapsed_time;
             sleep( $sleep_time );
         }
     }
@@ -115,14 +117,16 @@ sub poll_events()
     return 1;
 }
 
-sub update_location()
+sub update_location( Duration $elapsed_time )
 {
+    my Int $paddle_move = (PADDLE_MOVE_SPEED * $elapsed_time).round();
+
     if $move_up {
-        $paddle1_rect.y = $paddle1_rect.y - PADDLE_MOVE_SPEED;
+        $paddle1_rect.y = $paddle1_rect.y - $paddle_move;
         $paddle1_rect.y = 0 if $paddle1_rect.y < 0
     }
     if $move_down {
-        $paddle1_rect.y = $paddle1_rect.y + PADDLE_MOVE_SPEED;
+        $paddle1_rect.y = $paddle1_rect.y + $paddle_move;
         $paddle1_rect.y = PADDLE_BOTTOM_Y if $paddle1_rect.y > PADDLE_BOTTOM_Y;
     }
 }
