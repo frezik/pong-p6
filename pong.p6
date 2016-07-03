@@ -24,6 +24,8 @@ constant PADDLE_MARGIN_RIGHT = WIDTH - PADDLE_WIDTH - PADDLE_WIDTH;
 constant PADDLE_MOVE_SPEED = 240;
 constant PADDLE_BOTTOM_Y = HEIGHT - PADDLE_HEIGHT;
 
+constant BALL_MOVE_SPEED = 120;
+
 
 my $bg_rect = SDL_Rect.new( 0, 0, WIDTH, HEIGHT );
 my $paddle1_rect = SDL_Rect.new(
@@ -43,6 +45,7 @@ my $ball_rect = SDL_Rect.new(
 
 my $move_down = 0;
 my $move_up = 0;
+my Int $ball_move_angle = (^360).pick;
 
 
 sub init()
@@ -129,6 +132,13 @@ sub update_location( Duration $elapsed_time )
         $paddle1_rect.y = $paddle1_rect.y + $paddle_move;
         $paddle1_rect.y = PADDLE_BOTTOM_Y if $paddle1_rect.y > PADDLE_BOTTOM_Y;
     }
+
+    ($ball_rect.x, $ball_rect.y) = calculate_new_ball_location(
+        $ball_rect.x,
+        $ball_rect.y,
+        $ball_move_angle,
+        $elapsed_time,
+    );
 }
 
 sub update_drawing( $window, $render )
@@ -147,6 +157,25 @@ sub update_drawing( $window, $render )
 
     SDL_RenderPresent( $render );
     return;
+}
+
+sub calculate_new_ball_location(
+    Int $cur_ball_x,
+    Int $cur_ball_y,
+    Int $angle,
+    Duration $elapsed_time,
+)
+{
+    my Num $dist = BALL_MOVE_SPEED * $elapsed_time;
+    my Int $new_x = ($cur_ball_x + ($dist * cos( deg2rad( $angle ) ))).round;
+    my Int $new_y = ($cur_ball_y + ($dist * sin( deg2rad( $angle ) ))).round;
+    return ($new_x, $new_y);
+}
+
+
+sub deg2rad( $x )
+{
+    return $x * ( (312689/99532) / 180 );
 }
 
 
