@@ -45,7 +45,10 @@ my $ball_rect = SDL_Rect.new(
 
 my $move_down = 0;
 my $move_up = 0;
-my Int $ball_move_angle = (^360).pick;
+my Num $ball_velocity_x;
+my Num $ball_velocity_y;
+my Num $ball_x = BALL_START_X.Num;
+my Num $ball_y = BALL_START_Y.Num;
 
 
 sub init()
@@ -133,12 +136,12 @@ sub update_location( Duration $elapsed_time )
         $paddle1_rect.y = PADDLE_BOTTOM_Y if $paddle1_rect.y > PADDLE_BOTTOM_Y;
     }
 
-    ($ball_rect.x, $ball_rect.y) = calculate_new_ball_location(
-        $ball_rect.x,
-        $ball_rect.y,
-        $ball_move_angle,
+    ($ball_x, $ball_y) = calculate_new_ball_location(
+        $ball_x,
+        $ball_y,
         $elapsed_time,
     );
+    ($ball_rect.x, $ball_rect.y) = ($ball_x.round, $ball_y.round);
 }
 
 sub update_drawing( $window, $render )
@@ -160,18 +163,29 @@ sub update_drawing( $window, $render )
 }
 
 sub calculate_new_ball_location(
-    Int $cur_ball_x,
-    Int $cur_ball_y,
-    Int $angle,
+    Num $cur_ball_x,
+    Num $cur_ball_y,
     Duration $elapsed_time,
 )
 {
-    my Num $dist = BALL_MOVE_SPEED * $elapsed_time;
-    my Int $new_x = ($cur_ball_x + ($dist * cos( deg2rad( $angle ) ))).round;
-    my Int $new_y = ($cur_ball_y + ($dist * sin( deg2rad( $angle ) ))).round;
+    my Num $frame_velocity_x = $ball_velocity_x * $elapsed_time;
+    my Num $frame_velocity_y = $ball_velocity_y * $elapsed_time;
+
+    my Num $new_x = $cur_ball_x + $frame_velocity_x;
+    my Num $new_y = $cur_ball_y + $frame_velocity_y;
+
     return ($new_x, $new_y);
 }
 
+sub set_rand_ball_angle()
+{
+    my $angle = deg2rad( (^360).pick );
+
+    my $velocity_x = sin( $angle ) * BALL_MOVE_SPEED;
+    my $velocity_y = cos( $angle ) * BALL_MOVE_SPEED;
+
+    return ($velocity_x, $velocity_y);
+}
 
 sub deg2rad( $x )
 {
@@ -181,6 +195,7 @@ sub deg2rad( $x )
 
 {
     my ($window, $render) = init();
+    ($ball_velocity_x, $ball_velocity_y) = set_rand_ball_angle();
 
     say "Starting main loop";
     main_loop( $window, $render );
