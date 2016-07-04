@@ -24,7 +24,7 @@ constant PADDLE_MARGIN_RIGHT = WIDTH - PADDLE_WIDTH - PADDLE_WIDTH;
 constant PADDLE_MOVE_SPEED = 240;
 constant PADDLE_BOTTOM_Y = HEIGHT - PADDLE_HEIGHT;
 
-constant BALL_MOVE_SPEED = 120;
+constant BALL_MOVE_SPEED = 240;
 
 
 my $bg_rect = SDL_Rect.new( 0, 0, WIDTH, HEIGHT );
@@ -176,6 +176,34 @@ sub calculate_new_ball_location(
 
     my Num $new_x = $cur_ball_x + $frame_velocity_x;
     my Num $new_y = $cur_ball_y + $frame_velocity_y;
+
+    #
+    # Collision detection
+    #
+    if $new_y < 0 || $new_y >= HEIGHT {
+        # Hit either the top or bottom. Either way, reverse the Y direction.
+        $new_y = $cur_ball_y - $frame_velocity_y;
+        $ball_velocity_y = -$ball_velocity_y;
+    }
+
+    if $new_x < 0 {
+        # Ball on the left side of the screen. You lose!
+        exit 0;
+    }
+    elsif $new_x <= ($paddle1_rect.x + $paddle1_rect.w)
+        && $new_y >= $paddle1_rect.y
+        && $new_y <= ($paddle1_rect.y + $paddle1_rect.h) {
+        # Hit player's paddle, reverse X direction
+        $new_x = $cur_ball_x - $frame_velocity_x;
+        $ball_velocity_x = -$ball_velocity_x;
+    }
+    elsif ($new_x + $ball_rect.w) >= $paddle2_rect.x
+        && $new_y >= $paddle2_rect.y
+        && $new_y <= ($paddle2_rect.y + $paddle2_rect.h) {
+        # Hit AI paddle, reverse X direction
+        $new_x = $cur_ball_x - $frame_velocity_x;
+        $ball_velocity_x = -$ball_velocity_x;
+    }
 
     return ($new_x, $new_y);
 }
