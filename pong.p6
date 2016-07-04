@@ -180,7 +180,7 @@ sub calculate_new_ball_location(
     #
     # Collision detection
     #
-    if $new_y < 0 || $new_y >= HEIGHT {
+    if $new_y < 0 || ($new_y +$ball_rect.h) >= HEIGHT {
         # Hit either the top or bottom. Either way, reverse the Y direction.
         $new_y = $cur_ball_y - $frame_velocity_y;
         $ball_velocity_y = -$ball_velocity_y;
