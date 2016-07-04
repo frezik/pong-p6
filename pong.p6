@@ -142,6 +142,9 @@ sub update_location( Duration $elapsed_time )
         $elapsed_time,
     );
     ($ball_rect.x, $ball_rect.y) = ($ball_x.round, $ball_y.round);
+
+    $paddle2_rect.y = ($ball_rect.y
+        - ( ($paddle2_rect.h / 2) - ($ball_rect.h / 2))).round;
 }
 
 sub update_drawing( $window, $render )
