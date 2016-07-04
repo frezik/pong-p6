@@ -143,8 +143,15 @@ sub update_location( Duration $elapsed_time )
     );
     ($ball_rect.x, $ball_rect.y) = ($ball_x.round, $ball_y.round);
 
+    # AI paddle always matches ball's middle Y cord
     $paddle2_rect.y = ($ball_rect.y
         - ( ($paddle2_rect.h / 2) - ($ball_rect.h / 2))).round;
+    if $paddle2_rect.y < 0 {
+        $paddle2_rect.y = 0;
+    }
+    elsif ($paddle2_rect.y + $paddle2_rect.h) > HEIGHT {
+        $paddle2_rect.y = HEIGHT - $paddle2_rect.h;
+    }
 }
 
 sub update_drawing( $window, $render )
@@ -180,7 +187,7 @@ sub calculate_new_ball_location(
     #
     # Collision detection
     #
-    if $new_y < 0 || ($new_y +$ball_rect.h) >= HEIGHT {
+    if $new_y < 0 || ($new_y + $ball_rect.h) >= HEIGHT {
         # Hit either the top or bottom. Either way, reverse the Y direction.
         $new_y = $cur_ball_y - $frame_velocity_y;
         $ball_velocity_y = -$ball_velocity_y;
