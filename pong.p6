@@ -77,11 +77,13 @@ sub main_loop( $window, $render )
         update_drawing( $window, $render );
 
         my $end_frame = now;
-        $last_elapsed_time = $end_frame - $start_frame;
-        if $last_elapsed_time < TIME_PER_FRAME {
+        my $elapsed_time = $end_frame - $start_frame;
+        if $elapsed_time < TIME_PER_FRAME {
             my $sleep_time = TIME_PER_FRAME - $last_elapsed_time;
             sleep( $sleep_time );
         }
+
+        $last_elapsed_time = now - $start_frame;
     }
 
     return 1;
